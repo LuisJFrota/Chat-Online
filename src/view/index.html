@@ -9,9 +9,51 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.js"></script>
 </head>
 <body>
-    
+    <div>
+        <div id="msgarea" name="msgarea"></div>
+        <input type="text" id="name" name="name" placeholder="Nome">
+        <input type="text" id="msg" name="msg" placeholder="Mensagem">
+        <input type="button" id="sbmt_button" name="sbmt_button" value="Enviar">
+    </div>
 </body>
 <script type="text/javascript">
     var socket = io('http://localhost:3000')
+
+    var msgarea = document.getElementById('msgarea')
+    var authorfield = document.getElementById('name')
+    var msgfield = document.getElementById('msg')
+    var btn = document.getElementById('sbmt_button')
+
+    function renderMsg(data) {
+        var msg = {
+            author: data.author,
+            msg: data.msg
+        }
+        a = document.createElement('div')
+        a.append(`${msg.author}:${msg.msg}`)
+        msgarea.append(a)
+    }
+
+    btn.addEventListener("click", () => {
+        var messageobj = {
+            author: authorfield.value,
+            msg: msgfield.value
+        }
+
+        socket.emit('sendMessage', messageobj)
+        renderMsg(messageobj)
+    })
+
+    socket.on('previousMessages', data => {
+        for (msg of data)
+        {
+            renderMsg(msg)
+        }
+    })
+
+    socket.on('receiveMessage', data => {
+        renderMsg(data)
+    })
+
 </script>
 </html>

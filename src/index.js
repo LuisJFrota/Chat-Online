@@ -44,7 +44,7 @@ app.get('/rooms', (req,res) => {
 
 app.post('/createroom', (req,res) => {
     let roomid = crypto.randomBytes(16).toString("hex")
-    rooms.push({id:roomid,clients:[], numClients:0})
+    rooms.push({id:roomid,name: req.body.room_name,clients:[]})
     room = roomid
 
     res.redirect(`/room/${roomid}`)
@@ -89,7 +89,6 @@ function addRoomClient(room, client)
     {
         if(r.id == room)
         {      
-            r.numClients += 1
             r.clients.push(client)  
             console.log("Cliente entrou: "+r)     
         }

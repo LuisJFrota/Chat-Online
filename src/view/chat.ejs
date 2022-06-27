@@ -11,6 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 </head>
 <body>
+    <input type="hidden" id="room" name="room" value="<%=Room%>">
     <div class="p-5 m-5 bg-light border">
         <div class="container">
             <div class="row py-2">
@@ -38,6 +39,8 @@
 <script type="text/javascript">
     var socket = io('http://localhost:3000')
 
+    var room = document.getElementById('room')
+
     var msgarea = document.getElementById('msgarea')
     var authorfield = document.getElementById('name')
     var msgfield = document.getElementById('msg')
@@ -56,7 +59,8 @@
     function sendMsg() {
         var messageobj = {
             author: authorfield.value,
-            msg: msgfield.value
+            msg: msgfield.value,
+            room: room.value
         }
 
         socket.emit('sendMessage', messageobj)

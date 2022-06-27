@@ -61,9 +61,17 @@ io.on('connection', socket => {
     addRoomClient(room, socket.id)
 
     socket.on('sendMessage', data => {
-        console.log(data.room)
         socket.broadcast.to(data.room).emit('receiveMessage', data)
     })
+
+    socket.on('typing', (data,author) => {
+        socket.broadcast.to(data).emit('usertyping', author)
+    })
+
+    socket.on('doneTyping', data => {
+        socket.broadcast.to(data).emit('stoptyping')
+    })
+    
 
     socket.on('disconnect', (reason) => {
         removeRoomClient(socket.id)

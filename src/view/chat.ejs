@@ -21,12 +21,14 @@
             </div>
             <div class="row py-2">
                 <div class="col">
-                    <div class="form-control overflow-auto" style="height: 300px;" id="msgarea" name="msgarea"></div>
+                    <div class="form-control overflow-auto" style="height: 300px;" id="msgarea" name="msgarea">
+                        <p class="text-muted" name="typingfield" id="typingfield"></p>
+                    </div>
                 </div>     
             </div>
             <div class="row py-2">
                 <div class="col-6">
-                    <input class="form-control" type="text" id="msg" name="msg" placeholder="Mensagem">          
+                    <input class="form-control" onchange="typing()" type="text" id="msg" name="msg" placeholder="Mensagem">          
                 </div>
                 <div class="col-2">
                     <input class="btn btn-success" type="button" id="sbmt_button" name="sbmt_button" value="Enviar">
@@ -41,10 +43,33 @@
 
     var room = document.getElementById('room')
 
+    var typingfield = document.getElementById('typingfield')
     var msgarea = document.getElementById('msgarea')
     var authorfield = document.getElementById('name')
     var msgfield = document.getElementById('msg')
     var btn = document.getElementById('sbmt_button')
+
+    function typing()
+    {
+        if(msgfield.value != "")
+        {
+            sendTyping()
+        }
+        else
+        {
+            doneTyping()
+        }
+    }
+
+    function sendTyping()
+    {
+        socket.emit("typing", room.value, authorfield.value)
+    }
+
+    function doneTyping()
+    {
+        socket.emit("doneTyping", room.value)
+    }
 
     function renderMsg(data) {
         var msg = {
@@ -65,11 +90,13 @@
 
         socket.emit('sendMessage', messageobj)
         renderMsg(messageobj)
+        doneTyping()
         msgfield.value = ""
     }
 
     btn.addEventListener("click", () => {
         sendMsg()
+        typing()
     })
 
     msgfield.addEventListener("keypress", (e) => {
@@ -78,6 +105,14 @@
             event.preventDefault()
             sendMsg()
         }
+    })
+
+    socket.on('usertyping', data => {
+        typingfield.innerHTML = data + " está digitando"
+    })
+
+    socket.on('stoptyping', data => {
+        typingfield.innerHTML = ""
     })
 
     socket.on('previousMessages', data => {

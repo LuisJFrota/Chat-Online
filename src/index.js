@@ -28,7 +28,14 @@ let rooms = []
 let room
 
 app.get('/room/:id', (req,res) => {
-    res.render("chat.ejs", {Room: req.params.id})
+    if (checkRooms(req.params.id))
+    {
+        res.render("chat.ejs", {Room: req.params.id})
+    }
+    else
+    {
+        res.send("Sala não existe")
+    }
 })
 
 app.get('/rooms', (req,res) => {
@@ -63,6 +70,18 @@ io.on('connection', socket => {
         console.log(`Cliente ${socket.id} desconectou`)
     })
 })
+
+function checkRooms(id)
+{
+    let roomExist = false
+
+    for(r of rooms)
+    {
+        if(r.id == id) roomExist = true
+    }
+
+    return roomExist
+}
 
 function addRoomClient(room, client)
 {
